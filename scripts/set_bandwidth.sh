@@ -16,6 +16,6 @@ if [ -z "$CLIENT_IF" ]; then
 fi
 
 docker compose exec -T router \
-  tc class change dev "$CLIENT_IF" parent 1: classid 1:10 htb rate "$RATE" ceil "$RATE"
+  tc class change dev "$CLIENT_IF" parent 1: classid 1:1 htb rate "$RATE" ceil "$RATE"
 
-echo "[$(date +%H:%M:%S)] Bandwidth cap changed to $RATE on $CLIENT_IF"
+echo "[$(date +%H:%M:%S)] Total bandwidth cap changed to $RATE on $CLIENT_IF"
