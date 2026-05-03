@@ -1,0 +1,8 @@
+# Runtime results
+results/
+
+# Python virtualenv
+.venv/
+
+# Claude Code session files
+.claude/

@@ -1,0 +1,94 @@
+networks:
+  client-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.254
+  server-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
+          gateway: 172.21.0.254
+
+services:
+  router:
+    build: ./router
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    sysctls:
+      net.ipv4.ip_forward: 1
+    networks:
+      client-net:
+        ipv4_address: 172.20.0.1
+      server-net:
+        ipv4_address: 172.21.0.1
+
+  stream-server:
+    build: ./stream-server
+    networks:
+      server-net:
+        ipv4_address: 172.21.0.10
+
+  scp-server:
+    build: ./scp-server
+    networks:
+      server-net:
+        ipv4_address: 172.21.0.11
+
+  stream-client:
+    build: ./stream-client
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - stream-results:/results
+    networks:
+      client-net:
+        ipv4_address: 172.20.0.10
+    depends_on:
+      - router
+      - stream-server
+
+  scp-client-1:
+    build: ./scp-client
+    cap_add:
+      - NET_ADMIN
+    profiles:
+      - scp
+    networks:
+      client-net:
+        ipv4_address: 172.20.0.20
+    depends_on:
+      - router
+      - scp-server
+
+  scp-client-2:
+    build: ./scp-client
+    cap_add:
+      - NET_ADMIN
+    profiles:
+      - scp
+    networks:
+      client-net:
+        ipv4_address: 172.20.0.21
+    depends_on:
+      - router
+      - scp-server
+
+  scp-client-3:
+    build: ./scp-client
+    cap_add:
+      - NET_ADMIN
+    profiles:
+      - scp
+    networks:
+      client-net:
+        ipv4_address: 172.20.0.22
+    depends_on:
+      - router
+      - scp-server
+
+volumes:
+  stream-results:
